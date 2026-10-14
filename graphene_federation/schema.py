@@ -79,6 +79,7 @@ def build_schema(
     schema_directives: Optional[Collection[SchemaDirective]] = None,
     auto_camelcase: bool = True,
     federation_version: Optional[FederationVersion] = None,
+    schema_cls: type[Schema] = Schema,
 ) -> Schema:
     """
     Build Schema.
@@ -101,6 +102,8 @@ def build_schema(
         include_graphql_spec_directives (bool): Includes directives defined by GraphQL spec (@include, @skip,
             @deprecated, @specifiedBy)
         federation_version (FederationVersion): Specify the version explicit (default STABLE_VERSION)
+        schema_cls (type[Schema]): GraphQL schema class. Allows to customize the schema class used for building
+            the schema. Default is `Schema`.
     """
 
     federation_version = federation_version if federation_version else STABLE_VERSION
@@ -122,6 +125,7 @@ def build_schema(
         "directives": _directives.values(),
         "auto_camelcase": auto_camelcase,
         "include_graphql_spec_directives": include_graphql_spec_directives,
+        "schema_cls": schema_cls,
     }
 
     schema: Schema = build_directive_schema(query=query, **schema_args)

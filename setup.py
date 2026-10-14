@@ -36,7 +36,7 @@ setup(
     install_requires=[
         "graphene>=3.1",
         "graphql-core>=3.1",
-        "graphene-directives>=0.5.0",
+        "graphene-directives @ git+https://github.com/tsauerwein/graphene-directives.git@e0fc690e22d1132aa059b3905ff9940642a24dde",
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
