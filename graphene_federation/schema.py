@@ -24,19 +24,21 @@ from .service import get_service_query
 
 
 def _get_federation_query(
-    schema: Schema, query_cls: Optional[ObjectType] = None
-) -> Type[ObjectType]:
+    schema: Schema, add_service_query: bool, query_cls: Optional[ObjectType] = None
+) -> Optional[Type[ObjectType]]:
     """
     Add Federation required _service and _entities to Query(ObjectType)
     """
     type_name = "Query"
-    bases = [get_service_query(schema)]
+    bases = [get_service_query(schema)] if add_service_query else []
     entity_cls = get_entity_query(schema)
     if entity_cls:
         bases.append(entity_cls)
     if query_cls is not None:
         type_name = query_cls.__name__
         bases.append(query_cls)
+    if not bases:
+        return None
     federated_query_cls = type(type_name, tuple(bases), {})
     return federated_query_cls  # noqa
 
@@ -80,6 +82,7 @@ def build_schema(
     auto_camelcase: bool = True,
     federation_version: Optional[FederationVersion] = None,
     schema_cls: type[Schema] = Schema,
+    add_service_query: bool = True,
 ) -> Schema:
     """
     Build Schema.
@@ -104,6 +107,7 @@ def build_schema(
         federation_version (FederationVersion): Specify the version explicit (default STABLE_VERSION)
         schema_cls (type[Schema]): GraphQL schema class. Allows to customize the schema class used for building
             the schema. Default is `Schema`.
+        add_service_query (bool): Adds the `_service` query to the schema. Default True.
     """
 
     federation_version = federation_version if federation_version else STABLE_VERSION
@@ -208,6 +212,6 @@ def build_schema(
 
     # Add Federation required _service and _entities to Query
     return build_directive_schema(
-        query=_get_federation_query(schema, schema.query),
+        query=_get_federation_query(schema, add_service_query, schema.query),
         **schema_args,
     )
